@@ -7,13 +7,15 @@ import jsonwebtoken from 'jsonwebtoken'
 const signup = async (req, res, next) => {
   const { username, email, password } = req.body
   if (!username || !email || !password) {
-    next('Not Data')
+    next('Please Enter complete data')
   }
   const alreadyExistUsername = await User.findOne({ username })
   const alreadyExistEmail = await User.findOne({ email })
 
-  if (alreadyExistUsername || alreadyExistEmail) {
-    next('User already exist')
+  if (alreadyExistUsername) {
+    next('Username already exist')
+  } else if (alreadyExistEmail) {
+    next('Email already exist')
   } else {
     try {
       // const verificationToken = generateVerificationToken()
@@ -23,7 +25,7 @@ const signup = async (req, res, next) => {
         name: username,
         password: hashed_password
       })
-
+      // console.log("ok scene")
       return res
         .status(200)
         .json({ message: 'User added successfully', success: true })
@@ -54,7 +56,7 @@ const login = async (req, res, next) => {
             .json({ message: 'Incorrect Password', success: false })
         } else {
           auth_user.password = undefined
-          console.log(auth_user)
+          // console.log(auth_user)
           const success = true
           const token = jsonwebtoken.sign(
             { auth_user },
